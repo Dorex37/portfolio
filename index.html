@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dorex — Roblox Developer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #08061A;
+      --surface:   #0F0C24;
+      --card:      #171330;
+      --border:    rgba(127, 119, 221, 0.18);
+      --purple:    #7F77DD;
+      --purple-lt: #AFA9EC;
+      --purple-dim:#534AB7;
+      --text:      #EAE8F8;
+      --muted:     #8E8AAD;
+      --font-head: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(127,119,221,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(127,119,221,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(8, 6, 26, 0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    nav .wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 14px;
+      padding-bottom: 14px;
+    }
+    .nav-logo {
+      font-family: var(--font-head);
+      font-weight: 700;
+      font-size: 17px;
+      color: var(--purple-lt);
+      text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    /* HERO */
+    .hero { padding: 100px 0 80px; text-align: center; }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(127, 119, 221, 0.12);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px 5px 10px;
+      font-size: 13px;
+      color: var(--purple-lt);
+      margin-bottom: 28px;
+      letter-spacing: 0.4px;
+    }
+    .avail-dot {
+      width: 7px; height: 7px;
+      background: #4ade80;
+      border-radius: 50%;
+      animation: pulse 2.2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+    .hero h1 {
+      font-family: var(--font-head);
+      font-size: clamp(38px, 8vw, 62px);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -1.5px;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+    .hero h1 span { color: var(--purple); }
+    .hero p {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 480px;
+      margin: 0 auto 36px;
+    }
+    .btn-copy {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      background: var(--purple-dim);
+      color: #fff;
+      padding: 13px 26px;
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 15px;
+      transition: background 0.2s, transform 0.15s;
+      cursor: pointer;
+      border: none;
+      font-family: var(--font-body);
+    }
+    .btn-copy:hover { background: var(--purple); transform: translateY(-1px); }
+    .btn-copy svg { width: 20px; height: 20px; fill: #fff; flex-shrink: 0; }
+
+    /* STATS STRIP */
+    .stats-strip {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .stat-item {
+      padding: 28px 20px;
+      text-align: center;
+      border-right: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-item:hover { background: rgba(127,119,221,0.04); }
+    .stat-num {
+      font-family: var(--font-head);
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--purple-lt);
+      display: block;
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+    .stat-label { font-size: 12px; color: var(--muted); }
+
+    /* SECTIONS */
+    section { padding: 72px 0; }
+    .section-label {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--purple);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: var(--font-head);
+      font-size: clamp(24px, 5vw, 34px);
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      margin-bottom: 36px;
+      color: var(--text);
+    }
+    .divider { border: none; border-top: 1px solid var(--border); }
+
+    /* ABOUT */
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .about-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 24px;
+      transition: border-color 0.2s;
+    }
+    .about-card:hover { border-color: rgba(127,119,221,0.35); }
+    .about-card h3 {
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--purple-lt);
+      margin-bottom: 7px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .about-card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+    .about-bio {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 600px;
+      margin-bottom: 28px;
+      line-height: 1.75;
+    }
+    .about-bio em { color: var(--purple-lt); font-style: normal; }
+
+    /* PROJECTS */
+    .projects-list { display: flex; flex-direction: column; gap: 20px; }
+    .project-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .project-card:hover { border-color: rgba(127,119,221,0.4); transform: translateY(-2px); }
+    .video-wrap {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      background: var(--surface);
+    }
+    .video-wrap iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .project-info { padding: 18px 22px 20px; }
+    .project-title {
+      font-family: var(--font-head);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    .project-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+    .project-tag {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--purple-lt);
+      background: rgba(127,119,221,0.08);
+      letter-spacing: 0.2px;
+    }
+
+    /* CONTACT */
+    .discord-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 44px 36px;
+      text-align: center;
+    }
+    .discord-icon {
+      width: 52px; height: 52px;
+      margin: 0 auto 18px;
+      background: rgba(88, 101, 242, 0.15);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .discord-icon svg { width: 28px; height: 28px; fill: #7289da; }
+    .discord-box h2 {
+      font-family: var(--font-head);
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+    .discord-box p {
+      color: var(--muted);
+      font-size: 15px;
+      margin-bottom: 20px;
+      max-width: 360px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .username-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(127,119,221,0.1);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 15px;
+      color: var(--purple-lt);
+      font-weight: 500;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: var(--font-body);
+    }
+    .username-pill:hover { background: rgba(127,119,221,0.2); }
+    .username-pill svg { width: 14px; height: 14px; stroke: var(--purple-lt); fill: none; }
+    .copied-msg { font-size: 13px; color: var(--purple); height: 18px; transition: opacity 0.3s; }
+
+    footer { padding: 32px 0; text-align: center; font-size: 13px; color: var(--muted); }
+    footer span { color: var(--purple); }
+
+    /* REVEAL */
+    .reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero > * { animation: fadeUp 0.55s ease both; }
+    .hero .hero-badge { animation-delay: 0.05s; }
+    .hero h1          { animation-delay: 0.15s; }
+    .hero p           { animation-delay: 0.25s; }
+    .hero .btn-copy   { animation-delay: 0.35s; }
+
+    @media (max-width: 560px) {
+      .about-grid { grid-template-columns: 1fr; }
+      .stats-strip { grid-template-columns: 1fr; }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .stat-item:last-child { border-bottom: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="nav-logo" href="#">Dorex</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="hero-badge">
+      <span class="avail-dot"></span>
+      Open for commissions
+    </div>
+    <h1>Hi, I'm <span>Dorex</span></h1>
+    <p>I build games and experiences in Roblox Studio — scripting, systems, and everything in between.</p>
+    <button class="btn-copy" onclick="copyUser()">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+      dorex3
+    </button>
+  </header>
+</div>
+
+<!-- STATS -->
+<div class="stats-strip">
+  <div class="stat-item reveal">
+    <span class="stat-num">2.5yr</span>
+    <span class="stat-label">experience</span>
+  </div>
+  <div class="stat-item reveal">
+    <span class="stat-num">7+</span>
+    <span class="stat-label">commissions done</span>
+  </div>
+  <div class="stat-item reveal">
+    <span class="stat-num">100%</span>
+    <span class="stat-label">effort every time</span>
+  </div>
+</div>
+
+<hr class="divider">
+
+<section id="about">
+  <div class="wrap">
+    <div class="section-label reveal">Who I am</div>
+    <h2 class="section-title reveal">About me</h2>
+    <p class="about-bio reveal">
+      I'm <em>Dorex</em>, a Roblox developer with <em>2.5 years</em> of experience building games and scripting in Lua.
+      I love turning ideas into real playable experiences and I'm always working on something new.
+    </p>
+    <div class="about-grid">
+      <div class="about-card reveal">
+        <h3>Skills</h3>
+        <p>Lua scripting, game systems, server/client architecture, GUI design</p>
+      </div>
+      <div class="about-card reveal">
+        <h3>Experience</h3>
+        <p>2.5 years of Roblox Studio development, solo and team projects</p>
+      </div>
+      <div class="about-card reveal">
+        <h3>Open to</h3>
+        <p>Paid commissions — hit me up on Discord to discuss your project</p>
+      </div>
+      <div class="about-card reveal">
+        <h3>Tools</h3>
+        <p>Roblox Studio, VS Code, Rojo, and more</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="projects">
+  <div class="wrap">
+    <div class="section-label reveal">My work</div>
+    <h2 class="section-title reveal">Projects & videos</h2>
+    <div class="projects-list">
+
+      <div class="project-card reveal">
+        <div class="video-wrap">
+          <iframe
+            src="https://www.youtube.com/embed/sY57-g6CLzs"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+          </iframe>
+        </div>
+        <div class="project-info">
+          <div class="project-title">Lumberin</div>
+          <div class="project-tags">
+            <span class="project-tag">tree chopping system</span>
+            <span class="project-tag">level system</span>
+            <span class="project-tag">log weight mechanics</span>
+            <span class="project-tag">minigame system</span>
+            <span class="project-tag">custom gui</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="video-wrap">
+          <iframe
+            src="https://www.youtube.com/embed/9eGDzNzWEIM"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+          </iframe>
+        </div>
+        <div class="project-info">
+          <div class="project-title">Project 2</div>
+          <div class="project-tags">
+            <span class="project-tag">replace these</span>
+            <span class="project-tag">with your tags</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="contact">
+  <div class="wrap">
+    <div class="discord-box reveal">
+      <div class="discord-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+      </div>
+      <h2>Have a question or commission?</h2>
+      <p>Add me on Discord and we can talk about your project.</p>
+      <button class="username-pill" onclick="copyUser()">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        dorex3
+      </button>
+      <div class="copied-msg" id="copied-msg" style="opacity:0;">Copied!</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 <span>Dorex</span> · Roblox Developer</p>
+</footer>
+
+<script>
+  function copyUser() {
+    navigator.clipboard.writeText('dorex3').then(function() {
+      var msg = document.getElementById('copied-msg');
+      msg.style.opacity = '1';
+      setTimeout(function() { msg.style.opacity = '0'; }, 2000);
+    });
+  }
+
+  // scroll reveal
+  var els = document.querySelectorAll('.reveal');
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e, i) {
+      if (e.isIntersecting) {
+        setTimeout(function() { e.target.classList.add('visible'); }, i * 60);
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  els.forEach(function(el) { obs.observe(el); });
+</script>
+
+</body>
+</html>
